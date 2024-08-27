@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><%= title %></h1>
+    </header>
+    <main class="container">
+        <div class="left-section">
+            <button class="btn">Yo</button>
+            <button class="btn">Hello</button>
+        </div>
+        <div class="right-section">
+            <i class="fas fa-bell bell-icon"></i>
+            <button class="mark-all-read-btn">Mark All as Read</button>
+            <div class="notification-list">
+                <div class="notification-tile">
+                    <div class="tile-content">
+                        <div class="sender-name">John Doe</div>
+                        <div class="message-body">This is the first notification.</div>
+                    </div>
+                    <button class="mark-read-btn">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+                <div class="notification-tile">
+                    <div class="tile-content">
+                        <div class="sender-name">Jane Smith</div>
+                        <div class="message-body">This is the second notification.</div>
+                    </div>
+                    <button class="mark-read-btn">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+                <!-- Add more notification tiles as needed -->
+            </div>
+        </div>
+    </main>
+</body>
+</html>
