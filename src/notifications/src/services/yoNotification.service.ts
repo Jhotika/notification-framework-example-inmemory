@@ -1,4 +1,4 @@
-import { YoNotification } from "../models/yoNotification";
+import { IYoNotification, YoNotification } from "../models/yoNotification";
 import { NotificationService } from "../../lib/services/notification.service";
 
 export class YoNotificationService extends NotificationService {
@@ -16,26 +16,15 @@ export class YoNotificationService extends NotificationService {
         return new YoNotificationService(notificationService);
     };
 
-    async genCreateSplitInviteNotification(
-        invitedUserUuid: string, // owner
-        viewerUuid: string, // sender
-        message: string
-    ): Promise<void> {
-        const notif = YoNotification.New(
-            invitedUserUuid,
-            viewerUuid,
-            message,
-            {}
+    async genCreateNotification(
+        ownerId: string // the user that is being invited
+      ): Promise<void> {
+        console.log("YoNotificationService.genCreateNotification");
+        const notification: IYoNotification = YoNotification.New(
+          ownerId,
+          this.viewerId,
+          "Yo, what's up?"
         );
-        try {
-            await this.genSave(notif);
-        } catch (error) {
-            this.logger.error("Failed to send split invite notification", {
-                error: error,
-                invitedUserUuid: invitedUserUuid,
-                viewerUuid: viewerUuid,
-                message: message,
-            });
-        }
-    }
+        await this.genSave(notification);
+      }
 }

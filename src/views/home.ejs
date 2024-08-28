@@ -13,34 +13,126 @@
     </header>
     <main class="container">
         <div class="left-section">
-            <button class="btn">Yo</button>
-            <button class="btn">Hello</button>
+            <h2>Sender (Viewer)</h2>
+            <p>Viewer ID: <span id="viewerId"></span></p>
+            <button id="yoButton" class="btn">Send Yo</button>
+            <button id="helloButton" class="btn">Send Hello</button>
         </div>
         <div class="right-section">
-            <i class="fas fa-bell bell-icon"></i>
-            <button class="mark-all-read-btn">Mark All as Read</button>
-            <div class="notification-list">
-                <div class="notification-tile">
-                    <div class="tile-content">
-                        <div class="sender-name">John Doe</div>
-                        <div class="message-body">This is the first notification.</div>
-                    </div>
-                    <button class="mark-read-btn">
-                        <i class="fas fa-check"></i>
-                    </button>
-                </div>
-                <div class="notification-tile">
-                    <div class="tile-content">
-                        <div class="sender-name">Jane Smith</div>
-                        <div class="message-body">This is the second notification.</div>
-                    </div>
-                    <button class="mark-read-btn">
-                        <i class="fas fa-check"></i>
-                    </button>
-                </div>
-                <!-- Add more notification tiles as needed -->
+            <h2>Receiver (Owner)</h2>
+            <p>Owner ID: <span id="ownerId"></span></p>
+            <i id="bellIcon" class="fas fa-bell bell-icon"></i>
+            <button id="markAllReadBtn" class="mark-all-read-btn">Mark All as Read</button>
+            <div id="notificationList" class="notification-list">
+                <!-- Notifications will be dynamically inserted here -->
             </div>
         </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yoButton = document.getElementById('yoButton');
+            const helloButton = document.getElementById('helloButton');
+            const bellIcon = document.getElementById('bellIcon');
+            const notificationList = document.getElementById('notificationList');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const viewerIdSpan = document.getElementById('viewerId');
+            const ownerIdSpan = document.getElementById('ownerId');
+
+            const mockIds = {
+                ownerId: "owner__0001",
+                viewerId: "viewer__0001"
+            };
+
+            if (viewerIdSpan) viewerIdSpan.textContent = mockIds.viewerId;
+            if (ownerIdSpan) ownerIdSpan.textContent = mockIds.ownerId;
+
+            function sendNotification(type) {
+                fetch('http://localhost:8000/notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        type,
+                        senderId: mockIds.viewerId,
+                        receiverId: mockIds.ownerId
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function fetchNotifications() {
+                if (!notificationList) {
+                    console.error('Notification list element not found');
+                    return;
+                }
+
+                fetch(`http://localhost:8000/notifications?ownerId=${mockIds.ownerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    notificationList.innerHTML = ''; // Clear existing notifications
+                    if (data.notifications && Array.isArray(data.notifications)) {
+                        data.notifications.forEach(notification => {
+                            const notificationTile = document.createElement('div');
+                            notificationTile.className = 'notification-tile';
+                            notificationTile.innerHTML = `
+                                <div class="tile-content">
+                                    <div class="sender-name">From: ${notification.sender || 'Unknown Sender'}</div>
+                                    <div class="message-body">${notification.message || 'No message'}</div>
+                                </div>
+                                <button class="mark-read-btn">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            `;
+                            notificationList.appendChild(notificationTile);
+                        });
+                    } else {
+                        notificationList.innerHTML = '<p>No notifications found.</p>';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    notificationList.innerHTML = '<p>Failed to fetch notifications.</p>';
+                });
+            }
+
+            if (yoButton) {
+                yoButton.addEventListener('click', () => sendNotification('Yo'));
+            } else {
+                console.error('Yo button not found');
+            }
+
+            if (helloButton) {
+                helloButton.addEventListener('click', () => sendNotification('Hello'));
+            } else {
+                console.error('Hello button not found');
+            }
+
+            if (bellIcon) {
+                bellIcon.addEventListener('click', fetchNotifications);
+            } else {
+                console.error('Bell icon not found');
+            }
+
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', () => {
+                    // Implement mark all as read functionality here
+                    console.log('Mark all as read clicked');
+                });
+            } else {
+                console.error('Mark all read button not found');
+            }
+
+            // Fetch notifications when the page loads
+            fetchNotifications();
+        });
+    </script>
 </body>
 </html>

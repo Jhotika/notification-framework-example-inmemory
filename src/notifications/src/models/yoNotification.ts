@@ -6,7 +6,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { NotificationType } from "../notificationTypes";
   
-export interface IYoNotification<T> extends INotification<T> {
+export interface IYoNotification extends INotification<string> {
     message: string;
 }
 
@@ -15,12 +15,12 @@ export interface IYoNotificationResponse extends INotificationResponse {
     message: string;
 }
 
-export class YoNotification extends AbstractNotification implements IYoNotification<string> {
+export class YoNotification extends AbstractNotification implements IYoNotification {
 
     public readonly type = NotificationType.Yo;
     public message: string;
 
-    constructor(data: IYoNotification<string>) {
+    constructor(data: IYoNotification) {
         super(data);
     }
 
@@ -44,6 +44,7 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
     
 
     genResponse = async (): Promise<IYoNotificationResponse | null> => {
+        console.log("YoNotification.genResponse");
         return {
             notification: this,
             senderUid: this.senderUid,
@@ -51,6 +52,7 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
         }
     }
     public toINotification(): INotification<string> {
+        console.log("YoNotification.toINotification");
         return {
             uid: this.uid,
             type: this.type,
