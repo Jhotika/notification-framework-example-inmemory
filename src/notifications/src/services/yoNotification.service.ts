@@ -1,21 +1,19 @@
 import { YoNotification } from "../models/yoNotification";
 import { NotificationService } from "../../lib/services/notification.service";
 
-export class SplitInviteNotificationService extends NotificationService {
+export class YoNotificationService extends NotificationService {
     private constructor(parent: NotificationService) {
         super(
-        parent.viewerId,
-        parent.notificationRepository,
-        parent.userNotificationMetadataRepository,
-        parent.notificationClasses,
-        parent.logger
+            parent.viewerId,
+            parent.notificationRepository,
+            parent.userNotificationMetadataRepository,
+            parent.notificationClasses,
+            parent.logger
         );
     }
 
-    static fromNotificationService = (
-        notificationService: NotificationService
-    ): SplitInviteNotificationService => {
-        return new SplitInviteNotificationService(notificationService);
+    static fromNotificationService = ( notificationService: NotificationService ): YoNotificationService => {
+        return new YoNotificationService(notificationService);
     };
 
     async genCreateSplitInviteNotification(
@@ -24,20 +22,20 @@ export class SplitInviteNotificationService extends NotificationService {
         message: string
     ): Promise<void> {
         const notif = YoNotification.New(
-        invitedUserUuid,
-        viewerUuid,
-        message,
-        {}
+            invitedUserUuid,
+            viewerUuid,
+            message,
+            {}
         );
         try {
-        await this.genSave(notif);
+            await this.genSave(notif);
         } catch (error) {
-        this.logger.error("Failed to send split invite notification", {
-            error: error,
-            invitedUserUuid: invitedUserUuid,
-            viewerUuid: viewerUuid,
-            message: message,
-        });
+            this.logger.error("Failed to send split invite notification", {
+                error: error,
+                invitedUserUuid: invitedUserUuid,
+                viewerUuid: viewerUuid,
+                message: message,
+            });
         }
     }
 }

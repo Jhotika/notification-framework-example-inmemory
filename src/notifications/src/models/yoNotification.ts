@@ -2,7 +2,7 @@ import {
     AbstractNotification,
     INotification,
     INotificationResponse,
-  } from "../../lib/models/abstractNotification";
+} from "../../lib/models/abstractNotification";
 import { v4 as uuidv4 } from "uuid";
 import { NotificationType } from "../notificationTypes";
   
@@ -11,6 +11,7 @@ export interface IYoNotification<T> extends INotification<T> {
 }
 
 export interface IYoNotificationResponse extends INotificationResponse {
+    senderUid: string;
     message: string;
 }
 
@@ -28,7 +29,7 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
         senderUid: string,
         message: string,
         payload: Object = {}
-      ): YoNotification => {
+    ): YoNotification => {
         return new YoNotification({
             uid: uuidv4(),
             type: NotificationType.Yo,
@@ -39,14 +40,26 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
             isRead: false,
             createdAt: Date.now(),
         });
-      };
+    };
     
 
-    public genResponse(): Promise<INotificationResponse | null> {
-        throw new Error("Method not implemented.");
+    genResponse = async (): Promise<IYoNotificationResponse | null> => {
+        return {
+            notification: this,
+            senderUid: this.senderUid,
+            message: this.message,
+        }
     }
     public toINotification(): INotification<string> {
-        throw new Error("Method not implemented.");
+        return {
+            uid: this.uid,
+            type: this.type,
+            payload: this.payload,
+            ownerUid: this.ownerUid,
+            senderUid: this.senderUid,
+            isRead: this.isRead,
+            createdAt: this.createdAt,
+        };
     }
 }
   
