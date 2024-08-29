@@ -6,18 +6,7 @@ import MockIds from "../mock/mockIds";
 
 export class NotificationServiceFetcher {
     constructor(private readonly userId: string) {}
-    
-    // static fromRequest(req: Request): NotificationServiceFetcher {
-    //   // hardcoding the userId for demo purposes
-    //   // in a real application, you would get the userId from the request or middleware
-    //   const userId = MockIds.getInstance().ownerId;
-    //   console.log("NotificationServiceFetcher: userId", userId);
-    //   if (!userId) {
-    //     throw new Error("userId is required");
-    //   }
-    //   return new NotificationServiceFetcher(userId);
-    // }
-  
+
     static fromUserId(userId: string): NotificationServiceFetcher {
       return new NotificationServiceFetcher(userId);
     }

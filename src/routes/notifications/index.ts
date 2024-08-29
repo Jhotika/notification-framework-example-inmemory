@@ -24,15 +24,23 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/:uuid", async (req, res) => {
+  try {
+    await YoService.withNotificationService(MockIds.getInstance().viewerId).notificationService?.genMarkAsReadX(req.params.uuid);
+    res.json({ message: "Notification marked as read" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to mark notification as read" });
+  }
+});
+
 router.post("/markAllAsRead", async (req, res) => {
-  console.log("Received a POST request to mark all notifications");
+  console.log("Marking all notifications as read");
   try {
     const notificationService = NotificationServiceFetcher.fetchNotificationService();
     await notificationService.genMarkAllAsReadX();
 
-    const notificationResponses: Array<INotificationResponse> = await notificationService.genFetchAllResponseForUserX(0);
+    const notificationResponses = await notificationService.genFetchAllResponseForUserX(0);
     console.log("After marking all as read, notifications are:", notificationResponses);
-  
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error marking notifications read:", error);

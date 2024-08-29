@@ -137,3 +137,8 @@ footer {
         max-height: 200px;
     }
 }
+
+.notification-tile.read {
+    background-color: #e0ffe0; /* Light green background */
+    color: #007bff; /* Blue text */
+}

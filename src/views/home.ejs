@@ -29,6 +29,10 @@
             background-color: #f0f0f0;
             color: #aaa;
         }
+        .notification-tile.read {
+            background-color: #e0ffe0;
+            color: #007bff;
+        }
         .mark-read-btn {
             background-color: transparent;
             border: none;
@@ -126,25 +130,23 @@
             function addNotificationToList(notification) {
                 const notificationTile = document.createElement('div');
                 notificationTile.className = 'notification-tile';
+                
+                if (notification.isRead) {
+                    notificationTile.classList.add('disabled');
+                }
+                
                 notificationTile.innerHTML = `
-                    <div class="tile-content">
+                    <div class="tile-content ${notification.isRead ? 'disabled' : ''}">
+                        <div class="sender-name">From: ${notification.notification.uid || 'Unknown Sender'}</div>
                         <div class="sender-name">From: ${notification.senderUid || 'Unknown Sender'}</div>
                         <div class="message-body">${notification.message || 'No message'}</div>
                     </div>
-                    <button class="mark-read-btn">
-                        <i class="fas fa-check"></i>
-                    </button>
                 `;
-                const markReadBtn = notificationTile.querySelector('.mark-read-btn');
-                markReadBtn.addEventListener('click', function() {
-                    markNotificationAsRead(notification.id, notificationTile, markReadBtn);
-                });
-
                 notificationList.prepend(notificationTile);
             }
 
-            function markNotificationAsRead(notificationId, notificationTile, markReadBtn) {
-                fetch(`http://localhost:8000/notifications/${notificationId}/markAsRead`, {
+            function markAllNotificationsAsRead() {
+                fetch(`http://localhost:8000/notifications/markAllAsRead`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -152,27 +154,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    notificationTile.classList.add('disabled');
-                    markReadBtn.classList.add('disabled');
-                    markReadBtn.disabled = true;
-                })
-                .catch((error) => {
-                    console.error('Error marking notification as read:', error);
-                });
-            }
-
-            function markAllAsRead() {
-                fetch('http://localhost:8000/notifications/markAllAsRead', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        viewerId: mockIds.viewerId
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
+                    console.log('All notifications marked as read:', data);
                     fetchNotifications();
                 })
                 .catch((error) => {
@@ -193,10 +175,11 @@
             }
 
             if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', markAllAsRead);
+                markAllReadBtn.addEventListener('click', markAllNotificationsAsRead);
             } else {
                 console.error('Mark all read button not found');
             }
+
             fetchNotifications();
             setInterval(fetchNotifications, 10000);
         });

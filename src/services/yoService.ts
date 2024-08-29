@@ -18,18 +18,14 @@ export class YoService implements IWithMaybeNotificationService<NotificationServ
     ) {}
 
     static withNotificationService = ( viewerUid: string ): YoService => {
-        console.log("YoService.withNotificationService");
         const breaNotifFramework = ExampleNotificationFramework.getInstanceX();
         const notifService = breaNotifFramework.getNotificationServiceX(viewerUid);
-        console.log("Notification service created: ", notifService);
         return new YoService(viewerUid, notifService);
     }
 
     async doSomethingAndSendNotification(): Promise<boolean> {
-        console.log("YoService.doSomethingAndSendNotification");
         try {
             if (!this.notificationService) {
-              console.error("Notification service not initialized in TripsService");
               return true;
             } else {
               const notifService =
