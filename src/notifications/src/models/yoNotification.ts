@@ -17,7 +17,7 @@ export interface IYoNotificationResponse extends INotificationResponse {
 
 export class YoNotification extends AbstractNotification implements IYoNotification {
 
-    public readonly type = NotificationType.Yo;
+    public readonly type = "YoNotification";
     public message: string;
 
     constructor(data: IYoNotification) {
@@ -44,7 +44,6 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
     
 
     genResponse = async (): Promise<IYoNotificationResponse | null> => {
-        console.log("YoNotification.genResponse");
         return {
             notification: this,
             senderUid: this.senderUid,
@@ -52,7 +51,6 @@ export class YoNotification extends AbstractNotification implements IYoNotificat
         }
     }
     public toINotification(): INotification<string> {
-        console.log("YoNotification.toINotification");
         return {
             uid: this.uid,
             type: this.type,

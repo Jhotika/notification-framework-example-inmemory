@@ -21,6 +21,7 @@ export class YoService implements IWithMaybeNotificationService<NotificationServ
         console.log("YoService.withNotificationService");
         const breaNotifFramework = ExampleNotificationFramework.getInstanceX();
         const notifService = breaNotifFramework.getNotificationServiceX(viewerUid);
+        console.log("Notification service created: ", notifService);
         return new YoService(viewerUid, notifService);
     }
 

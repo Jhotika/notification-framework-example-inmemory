@@ -7,23 +7,24 @@ import MockIds from "../mock/mockIds";
 export class NotificationServiceFetcher {
     constructor(private readonly userId: string) {}
     
-    static fromRequest(req: Request): NotificationServiceFetcher {
-      // hardcoding the userId for demo purposes
-      // in a real application, you would get the userId from the request or middleware
-      const userId = MockIds.getInstance().viewerId;
-      if (!userId) {
-        throw new Error("userId is required");
-      }
-      return new NotificationServiceFetcher(userId);
-    }
+    // static fromRequest(req: Request): NotificationServiceFetcher {
+    //   // hardcoding the userId for demo purposes
+    //   // in a real application, you would get the userId from the request or middleware
+    //   const userId = MockIds.getInstance().ownerId;
+    //   console.log("NotificationServiceFetcher: userId", userId);
+    //   if (!userId) {
+    //     throw new Error("userId is required");
+    //   }
+    //   return new NotificationServiceFetcher(userId);
+    // }
   
     static fromUserId(userId: string): NotificationServiceFetcher {
       return new NotificationServiceFetcher(userId);
     }
   
-    fetchNotificationService(): NotificationService {
+    static fetchNotificationService(): NotificationService {
       const notifFramework = ExampleNotificationFramework.getInstanceX();
-      return notifFramework.getNotificationServiceX(this.userId);
+      return notifFramework.getNotificationServiceX(MockIds.getInstance().ownerId);
     }
     fetchUserNotificationMetadataService(): UserNotificationMetadataService {
       const notifFramework = ExampleNotificationFramework.getInstanceX();

@@ -6,6 +6,40 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .left-section, .right-section {
+            width: 45%;
+        }
+        .notification-list {
+            margin-top: 20px;
+        }
+        .notification-tile {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification-tile.disabled {
+            background-color: #f0f0f0;
+            color: #aaa;
+        }
+        .mark-read-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #007bff;
+        }
+        .mark-read-btn.disabled {
+            color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,7 +50,6 @@
             <h2>Sender (Viewer)</h2>
             <p>Viewer ID: <span id="viewerId"></span></p>
             <button id="yoButton" class="btn">Send Yo</button>
-            <button id="helloButton" class="btn">Send Hello</button>
         </div>
         <div class="right-section">
             <h2>Receiver (Owner)</h2>
@@ -32,7 +65,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const yoButton = document.getElementById('yoButton');
-            const helloButton = document.getElementById('helloButton');
             const bellIcon = document.getElementById('bellIcon');
             const notificationList = document.getElementById('notificationList');
             const markAllReadBtn = document.getElementById('markAllReadBtn');
@@ -47,14 +79,13 @@
             if (viewerIdSpan) viewerIdSpan.textContent = mockIds.viewerId;
             if (ownerIdSpan) ownerIdSpan.textContent = mockIds.ownerId;
 
-            function sendNotification(type) {
+            function sendNotification() {
                 fetch('http://localhost:8000/notifications', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ 
-                        type,
                         senderId: mockIds.viewerId,
                         receiverId: mockIds.ownerId
                     }),
@@ -62,6 +93,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
+                    fetchNotifications();
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -77,22 +109,10 @@
                 fetch(`http://localhost:8000/notifications?ownerId=${mockIds.ownerId}`)
                 .then(response => response.json())
                 .then(data => {
-                    notificationList.innerHTML = ''; // Clear existing notifications
+                    console.log('Fetched notifications:', data);
+                    notificationList.innerHTML = '';
                     if (data.notifications && Array.isArray(data.notifications)) {
-                        data.notifications.forEach(notification => {
-                            const notificationTile = document.createElement('div');
-                            notificationTile.className = 'notification-tile';
-                            notificationTile.innerHTML = `
-                                <div class="tile-content">
-                                    <div class="sender-name">From: ${notification.sender || 'Unknown Sender'}</div>
-                                    <div class="message-body">${notification.message || 'No message'}</div>
-                                </div>
-                                <button class="mark-read-btn">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            `;
-                            notificationList.appendChild(notificationTile);
-                        });
+                        data.notifications.forEach(addNotificationToList);
                     } else {
                         notificationList.innerHTML = '<p>No notifications found.</p>';
                     }
@@ -103,16 +123,67 @@
                 });
             }
 
-            if (yoButton) {
-                yoButton.addEventListener('click', () => sendNotification('Yo'));
-            } else {
-                console.error('Yo button not found');
+            function addNotificationToList(notification) {
+                const notificationTile = document.createElement('div');
+                notificationTile.className = 'notification-tile';
+                notificationTile.innerHTML = `
+                    <div class="tile-content">
+                        <div class="sender-name">From: ${notification.senderUid || 'Unknown Sender'}</div>
+                        <div class="message-body">${notification.message || 'No message'}</div>
+                    </div>
+                    <button class="mark-read-btn">
+                        <i class="fas fa-check"></i>
+                    </button>
+                `;
+                const markReadBtn = notificationTile.querySelector('.mark-read-btn');
+                markReadBtn.addEventListener('click', function() {
+                    markNotificationAsRead(notification.id, notificationTile, markReadBtn);
+                });
+
+                notificationList.prepend(notificationTile);
             }
 
-            if (helloButton) {
-                helloButton.addEventListener('click', () => sendNotification('Hello'));
+            function markNotificationAsRead(notificationId, notificationTile, markReadBtn) {
+                fetch(`http://localhost:8000/notifications/${notificationId}/markAsRead`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    notificationTile.classList.add('disabled');
+                    markReadBtn.classList.add('disabled');
+                    markReadBtn.disabled = true;
+                })
+                .catch((error) => {
+                    console.error('Error marking notification as read:', error);
+                });
+            }
+
+            function markAllAsRead() {
+                fetch('http://localhost:8000/notifications/markAllAsRead', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        viewerId: mockIds.viewerId
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    fetchNotifications();
+                })
+                .catch((error) => {
+                    console.error('Error marking all notifications as read:', error);
+                });
+            }
+
+            if (yoButton) {
+                yoButton.addEventListener('click', sendNotification);
             } else {
-                console.error('Hello button not found');
+                console.error('Yo button not found');
             }
 
             if (bellIcon) {
@@ -122,16 +193,12 @@
             }
 
             if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', () => {
-                    // Implement mark all as read functionality here
-                    console.log('Mark all as read clicked');
-                });
+                markAllReadBtn.addEventListener('click', markAllAsRead);
             } else {
                 console.error('Mark all read button not found');
             }
-
-            // Fetch notifications when the page loads
             fetchNotifications();
+            setInterval(fetchNotifications, 10000);
         });
     </script>
 </body>

@@ -1,4 +1,4 @@
 export enum NotificationType {
-    Yo = "yo",
-    Hello = "hello",
+    Yo = "Yo",
+    Hello = "Hello",
 }

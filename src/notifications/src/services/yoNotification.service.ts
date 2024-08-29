@@ -17,14 +17,20 @@ export class YoNotificationService extends NotificationService {
     };
 
     async genCreateNotification(
-        ownerId: string // the user that is being invited
+        ownerId: string // the user that will receive the notification
       ): Promise<void> {
-        console.log("YoNotificationService.genCreateNotification");
+        console.log("YoNotificationService.genCreateNotification: ownerId", ownerId, "viewerId", this.viewerId);
         const notification: IYoNotification = YoNotification.New(
           ownerId,
           this.viewerId,
           "Yo, what's up?"
         );
-        await this.genSave(notification);
+        console.log("Notification created: ", notification);
+        try {
+          await this.genSave(notification);
+          console.log("Notification saved in memory");
+        } catch (error) {
+          console.log(error);
+        }
       }
 }
