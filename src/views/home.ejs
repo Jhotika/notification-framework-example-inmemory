@@ -92,12 +92,24 @@
                 const notificationTile = document.createElement('div');
                 notificationTile.className = `p-4 border-b border-gray-200 flex justify-between items-center ${notification.notification.isRead ? 'bg-gray-100 text-gray-500' : ''}`;
             
+                const tickButton = document.createElement('button');
+                tickButton.className = `ml-2 ${notification.notification.isRead ? 'text-gray-400 cursor-not-allowed' : 'text-green-500 hover:text-green-700'}`;
+                tickButton.innerHTML = '<i class="fas fa-check"></i>';
+                tickButton.title = notification.notification.isRead ? 'Already read' : 'Mark as read';
+                
+                if (!notification.notification.isRead) {
+                    tickButton.addEventListener('click', () => markNotificationAsRead(notification.notification.uid));
+                } else {
+                    tickButton.disabled = true;
+                }
+            
                 notificationTile.innerHTML = `
                     <div class="flex-grow">
                         <div class="font-bold mb-1">From: ${notification.notification.uid || notification.senderUid || 'Unknown Sender'}</div>
                         <div class="${notification.notification.isRead ? 'text-gray-400' : 'text-gray-600'}">${notification.message || 'No message'}</div>
                     </div>
                 `;
+                notificationTile.appendChild(tickButton);
                 notificationList.prepend(notificationTile);
             }
 
@@ -115,6 +127,23 @@
                 })
                 .catch((error) => {
                     console.error('Error marking all notifications as read:', error);
+                });
+            }
+
+            function markNotificationAsRead(notificationId) {
+                fetch(`http://localhost:8000/notifications/${notificationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Notification marked as read:', data);
+                    fetchNotifications();
+                })
+                .catch((error) => {
+                    console.error('Error marking notification as read:', error);
                 });
             }
 
