@@ -1,6 +1,6 @@
-# Notification Framework In-Memory Integration
+# Notification Framework Demo
 
-This Repository provides an example of how to integrate the Notification Framework with an In-Memory database to an express application.
+A demo of [Notification Framework](https://github.com/Jhotika/notification-framework) integration to a NodeJS/Express application
 
 ## Installation
 
