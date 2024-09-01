@@ -75,3 +75,9 @@ Marks a specific notification as read.
 - **Action**: Marks the specified notification as read using YoService.
 - **Response**: Returns a JSON object with a success message.
 - **Error Handling**: Returns a 500 status code if marking the notification as read fails.
+
+## Demo
+
+https://github.com/user-attachments/assets/033b1b58-87e7-441e-b8ff-740c44f5cf7f
+
+
